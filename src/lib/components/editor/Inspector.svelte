@@ -5,6 +5,7 @@
 	import { Label } from '$lib/components/ui/label';
 	import { Textarea } from '$lib/components/ui/textarea';
 	import { Button } from '$lib/components/ui/button';
+	import * as Select from '$lib/components/ui/select';
 
 	export let selectedElement: {
 		type: string;
@@ -15,16 +16,42 @@
 		height: number;
 		properties: {
 			text: string;
-			jsAction: string;
+			jsActions: Record<string, string>;
 			color: string;
 			imageData?: string;
 		};
 	} | null;
 	export let onElementUpdate: (element: any) => void;
 
+	// PDF JavaScript events
+	const pdfEvents = {
+		'Mouse Up': 'U',
+		'Mouse Down': 'D',
+		'Mouse Enter': 'E',
+		'Mouse Exit': 'X',
+		'On Change': 'K'
+	} as const;
+
+	type PDFEventKey = keyof typeof pdfEvents;
+	let selectedEvent: PDFEventKey = 'Mouse Up';
+
 	function updateElement() {
 		if (selectedElement) {
 			onElementUpdate({ ...selectedElement });
+		}
+	}
+
+	function updateEventAction(event: PDFEventKey, action: string) {
+		if (selectedElement) {
+			if (!selectedElement.properties.jsActions) {
+				selectedElement.properties.jsActions = {};
+			}
+			if (action) {
+				selectedElement.properties.jsActions[pdfEvents[event]] = action;
+			} else {
+				delete selectedElement.properties.jsActions[pdfEvents[event]];
+			}
+			updateElement();
 		}
 	}
 
@@ -127,13 +154,29 @@
 					</div>
 
 					<div class="grid grid-cols-4 items-center gap-4">
-						<Label class="text-right">Action</Label>
-						<Textarea
-							class="col-span-3"
-							bind:value={selectedElement.properties.jsAction}
-							onchange={updateElement}
-							rows={4}
-						/>
+						<Label class="text-right">Events</Label>
+						<div class="col-span-3 space-y-2">
+							<Select.Root
+								type="single"
+								value={selectedEvent}
+								onValueChange={(v: string) => (selectedEvent = v as PDFEventKey)}
+							>
+								<Select.SelectTrigger>
+									{selectedEvent}
+								</Select.SelectTrigger>
+								<Select.SelectContent>
+									{#each Object.keys(pdfEvents) as event}
+										<Select.SelectItem value={event}>{event}</Select.SelectItem>
+									{/each}
+								</Select.SelectContent>
+							</Select.Root>
+							<Textarea
+								rows={4}
+								placeholder="JavaScript code for the selected event"
+								value={selectedElement.properties.jsActions?.[pdfEvents[selectedEvent]] || ''}
+								oninput={(e) => updateEventAction(selectedEvent, e.currentTarget.value)}
+							/>
+						</div>
 					</div>
 				{/if}
 			</div>

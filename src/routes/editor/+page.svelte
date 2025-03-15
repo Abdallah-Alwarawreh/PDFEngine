@@ -134,7 +134,12 @@ initGame();`;
 		// Export PDF (Ctrl+E)
 		else if (event.ctrlKey && !event.shiftKey && event.key.toLowerCase() === 'e') {
 			event.preventDefault();
-			exportToPDF();
+			exportToPDF(true); // Download
+		}
+		// Preview PDF (Ctrl+P)
+		else if (event.ctrlKey && !event.shiftKey && event.key.toLowerCase() === 'p') {
+			event.preventDefault();
+			exportToPDF(false); // Preview
 		}
 	}
 
@@ -148,6 +153,13 @@ initGame();`;
 		checkMobile();
 		window.addEventListener('resize', checkMobile);
 		window.addEventListener('keydown', handleShortcuts);
+
+		// Add refresh warning
+		window.addEventListener('beforeunload', (e) => {
+			e.preventDefault();
+			e.returnValue = '';
+			return '';
+		});
 
 		// Check for File System Access API support
 		hasFileSystem = 'showSaveFilePicker' in window;
@@ -169,6 +181,7 @@ initGame();`;
 			window.removeEventListener('touchmove', handleTouchMove);
 			window.removeEventListener('touchend', handleTouchEnd);
 			window.removeEventListener('keydown', handleKeyDown);
+			window.removeEventListener('beforeunload', () => {});
 		};
 	});
 
@@ -209,7 +222,7 @@ initGame();`;
 			properties: {
 				color: '#e6e6e6',
 				text: type === 'button' ? 'Click Me' : type === 'text' ? 'New Text' : '',
-				jsAction: '',
+				jsActions: {},
 				imageData: type === 'image' ? '' : undefined
 			}
 		};
@@ -378,7 +391,7 @@ initGame();`;
 	}
 
 	// Export the game to PDF
-	async function exportToPDF() {
+	async function exportToPDF(shouldDownload = false) {
 		try {
 			const pdfDoc = await PDFDocument.create();
 
@@ -408,11 +421,10 @@ initGame();`;
 			// Add game elements to PDF
 			for (const element of gameElements) {
 				if (element.type === 'button') {
-					const jsActions = element.properties.jsAction
-						? {
-								U: element.properties.jsAction
-							}
-						: undefined;
+					const jsActions =
+						element.properties.jsActions && Object.keys(element.properties.jsActions).length > 0
+							? element.properties.jsActions
+							: undefined;
 
 					const button = PDFHelper.createButton(
 						pdfDoc,
@@ -442,11 +454,10 @@ initGame();`;
 					textField.set(PDFName.of('Ff'), PDFNumber.of(1));
 					annotations.push(textField);
 				} else if (element.type === 'field') {
-					const jsActions = element.properties.jsAction
-						? {
-								K: element.properties.jsAction
-							}
-						: undefined;
+					const jsActions =
+						element.properties.jsActions && Object.keys(element.properties.jsActions).length > 0
+							? element.properties.jsActions
+							: undefined;
 
 					const field = PDFHelper.createField(
 						pdfDoc,
@@ -478,11 +489,10 @@ initGame();`;
 							imageBytes[i] = binaryString.charCodeAt(i);
 						}
 
-						const jsActions = element.properties.jsAction
-							? {
-									U: element.properties.jsAction
-								}
-							: undefined;
+						const jsActions =
+							element.properties.jsActions && Object.keys(element.properties.jsActions).length > 0
+								? element.properties.jsActions
+								: undefined;
 
 						const imageAnnotation = await PDFHelper.createImage(
 							pdfDoc,
@@ -514,8 +524,16 @@ initGame();`;
 			const blob = new Blob([pdfBytes], { type: 'application/pdf' });
 			const url = URL.createObjectURL(blob);
 
-			// Open in new tab instead of downloading
-			window.open(url, '_blank');
+			if (shouldDownload) {
+				// Download the file
+				const a = document.createElement('a');
+				a.href = url;
+				a.download = `${gameTitle.replace(/\s+/g, '_')}.pdf`;
+				a.click();
+			} else {
+				// Open in new tab
+				window.open(url, '_blank');
+			}
 
 			// Clean up the URL after a delay to ensure it's loaded
 			setTimeout(() => URL.revokeObjectURL(url), 1000);
@@ -659,7 +677,8 @@ initGame();`;
 		onSave={saveProject}
 		onSaveAs={saveProjectAs}
 		onLoad={loadProject}
-		onExportPDF={exportToPDF}
+		onExportPDF={() => exportToPDF(true)}
+		onPreviewPDF={() => exportToPDF(false)}
 		{gameTitle}
 		{canvasWidth}
 		{canvasHeight}

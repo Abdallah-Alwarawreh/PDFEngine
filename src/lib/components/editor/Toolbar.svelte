@@ -14,6 +14,7 @@
 	export let onSaveAs: () => void;
 	export let onLoad: () => void;
 	export let onExportPDF: () => void;
+	export let onPreviewPDF: () => void;
 	export let hasFileSystem: boolean;
 	export let gameTitle: string;
 	export let canvasWidth: number;
@@ -46,8 +47,12 @@
 				</DropdownMenuItem>
 				<DropdownMenuSeparator />
 				<DropdownMenuItem onclick={onExportPDF}>
-					Export PDF
+					Download PDF
 					<div class="ml-auto text-xs text-muted-foreground">Ctrl+E</div>
+				</DropdownMenuItem>
+				<DropdownMenuItem onclick={onPreviewPDF}>
+					Preview PDF
+					<div class="ml-auto text-xs text-muted-foreground">Ctrl+P</div>
 				</DropdownMenuItem>
 			</DropdownMenuContent>
 		</DropdownMenu>
