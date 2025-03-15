@@ -1,0 +1,54 @@
+name: Build & Deploy
+run-name: Deploying ${{ github.repository }}
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  deployments: write
+  pages: write
+
+jobs:
+  build-and-deploy:
+    name: Perform Build & Deploy
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: ['20']
+
+    steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@ea8b747819ff6d82907eb4018229f1a75c174697 # v2.6.1
+        with:
+          egress-policy: audit
+
+      - name: Checkout repository
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+
+      - name: Set up Node ${{ matrix.node-version }}
+        uses: actions/setup-node@5ef044f9d09786428e6e895be6be17937becee3a # v4.0.0
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'yarn'
+
+      - name: Install Yarn
+        run: npm install -g yarn
+
+      - name: Install Dependencies
+        run: yarn install --frozen-lockfile --prefer-offline
+
+      - name: Build project
+        run: yarn build
+
+      - name: Deploy to gh-pages
+        run: |
+          git remote set-url origin https://git:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git
+          yarn add gh-pages --dev
+          npx gh-pages -d build -u "github-actions-bot <support+actions@github.com>"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
