@@ -541,12 +541,12 @@ initGame();`;
 			if (!currentFileHandle) {
 				// If no file is open, show save dialog
 				currentFileHandle = await window.showSaveFilePicker({
-					suggestedName: `${gameTitle.replace(/\s+/g, '_')}.basedEngine`,
+					suggestedName: `${gameTitle.replace(/\s+/g, '_')}.pdfengine`,
 					types: [
 						{
 							description: 'Based Engine Project',
 							accept: {
-								'application/json': ['.basedEngine']
+								'application/json': ['.pdfengine']
 							}
 						}
 					]
@@ -579,7 +579,7 @@ initGame();`;
 					{
 						description: 'Based Engine Project',
 						accept: {
-							'application/json': ['.basedEngine']
+							'application/json': ['.pdfengine']
 						}
 					}
 				]
@@ -618,7 +618,7 @@ initGame();`;
 		const url = URL.createObjectURL(blob);
 		const a = document.createElement('a');
 		a.href = url;
-		a.download = `${gameTitle.replace(/\s+/g, '_')}.basedEngine`;
+		a.download = `${gameTitle.replace(/\s+/g, '_')}.pdfengine`;
 		a.click();
 		URL.revokeObjectURL(url);
 	}
