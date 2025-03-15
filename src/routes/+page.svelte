@@ -177,7 +177,7 @@
 			<div class="flex justify-center space-x-4">
 				<Button href="/editor" class="animate-bounce-subtle">Get Started</Button>
 				<Button
-					href="https://github.com/Abdallah-Alwarawreh/PDFEngine/docs/scripting-guide.md"
+					href="https://github.com/Abdallah-Alwarawreh/PDFEngine/blob/main/docs/scripting-guide.md"
 					variant="outline"
 					class="backdrop-blur-sm">Documentation</Button
 				>
