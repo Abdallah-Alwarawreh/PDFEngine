@@ -89,41 +89,23 @@ function moveField(field, x, y, width, height) {
 
 ## Input Handling
 
-### Mouse Events
-
-```javascript
-// These functions are called by field event handlers
-function onMouseDown(field) {
-	let pos = getFieldCenter(field);
-	// Handle mouse down at pos.x, pos.y
-}
-
-function onMouseUp(field) {
-	// Handle mouse up
-}
-
-function onMouseEnter(field) {
-	// Handle mouse enter
-}
-
-function onMouseExit(field) {
-	// Handle mouse exit
-}
-```
-
 ### Keyboard Events
 
+In order for this to work, you need a text field with a javascript action of `key_pressed(event.change)` players must be typing in the text field to move.
+
 ```javascript
-// Handle key press
-function onKeyPress(field, keyCode) {
-	switch (keyCode) {
-		case 37: // Left arrow
-			movePlayerLeft();
+function key_pressed(key) {
+	const paddleHeight = paddleR.rect[3] - paddleR.rect[1];
+	switch (key) {
+		case 's':
+			if (paddleRPosition.y > MINHEIGHT) paddleRPosition.y -= 5;
 			break;
-		case 39: // Right arrow
-			movePlayerRight();
+		case 'w':
+			if (paddleRPosition.y < 455) paddleRPosition.y += 5;
 			break;
 	}
+	let paddle = this.getField('field_paddle_R');
+	paddle.rect = setRectPosition(paddle.rect, paddleRPosition, 32, 100);
 }
 ```
 
@@ -148,37 +130,6 @@ function checkCollisions() {
 
 	if (checkCollision(player, enemy)) {
 		handleCollision();
-	}
-}
-```
-
-## Game State Management
-
-```javascript
-// Initialize game state
-let gameState = {
-	score: 0,
-	lives: 3,
-	playerPos: { x: WIDTH / 2, y: HEIGHT / 2 },
-	enemies: [],
-	powerups: [],
-	isGameOver: false
-};
-
-// Update game state
-function updateGameState() {
-	// Update player
-	let player = this.getField('field_player');
-	gameState.playerPos = getFieldCenter(player);
-
-	// Update score
-	let scoreField = this.getField('field_score');
-	scoreField.value = gameState.score.toString();
-
-	// Check game over
-	if (gameState.lives <= 0) {
-		gameState.isGameOver = true;
-		endGame();
 	}
 }
 ```
@@ -213,111 +164,12 @@ function distance(pos1, pos2) {
 }
 ```
 
-## Example Game: Simple Collector
-
-Here's a complete example of a simple collection game:
-
-```javascript
-// Configuration
-const WIDTH = 500;
-const HEIGHT = 500;
-const PLAYER_SPEED = 5;
-const COIN_COUNT = 5;
-
-// Game state
-let gameState = {
-	score: 0,
-	coins: [],
-	isGameOver: false
-};
-
-// Initialize game
-function initGame() {
-	if (global.initialized) return;
-	global.initialized = true;
-
-	// Setup player
-	let player = this.getField('field_player');
-	moveField(player, WIDTH / 2, HEIGHT / 2, 20, 20);
-
-	// Create coins
-	for (let i = 0; i < COIN_COUNT; i++) {
-		spawnCoin();
-	}
-
-	// Start game loop
-	app.setInterval('updateGame()', 1000 / 60);
-}
-
-// Spawn a coin at random position
-function spawnCoin() {
-	let coin = this.getField(`field_coin_${gameState.coins.length}`);
-	let x = random(20, WIDTH - 20);
-	let y = random(20, HEIGHT - 20);
-	moveField(coin, x, y, 10, 10);
-	gameState.coins.push(coin);
-}
-
-// Update game state
-function updateGame() {
-	if (gameState.isGameOver) return;
-
-	let player = this.getField('field_player');
-
-	// Check coin collisions
-	for (let i = gameState.coins.length - 1; i >= 0; i--) {
-		let coin = gameState.coins[i];
-		if (checkCollision(player, coin)) {
-			// Collect coin
-			gameState.score += 1;
-			gameState.coins.splice(i, 1);
-			spawnCoin();
-
-			// Update score display
-			let scoreField = this.getField('field_score');
-			scoreField.value = gameState.score.toString();
-		}
-	}
-}
-
-// Handle keyboard input
-function onKeyPress(field, keyCode) {
-	let player = this.getField('field_player');
-	let pos = getFieldCenter(player);
-
-	switch (keyCode) {
-		case 37: // Left
-			pos.x -= PLAYER_SPEED;
-			break;
-		case 39: // Right
-			pos.x += PLAYER_SPEED;
-			break;
-		case 38: // Up
-			pos.y += PLAYER_SPEED;
-			break;
-		case 40: // Down
-			pos.y -= PLAYER_SPEED;
-			break;
-	}
-
-	// Keep player in bounds
-	pos.x = Math.max(10, Math.min(WIDTH - 10, pos.x));
-	pos.y = Math.max(10, Math.min(HEIGHT - 10, pos.y));
-
-	moveField(player, pos.x, pos.y, 20, 20);
-}
-
-// Start the game
-initGame();
-```
-
 ## Limitations
 
 1. The PDF JavaScript environment is sandboxed
 2. No access to external resources
 3. Limited to PDF form fields for visual elements
 4. No direct pixel manipulation
-5. Performance depends on PDF reader implementation
 
 ## Debugging
 
