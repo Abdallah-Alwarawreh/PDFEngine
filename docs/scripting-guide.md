@@ -89,6 +89,10 @@ function moveField(field, x, y, width, height) {
 
 ## Input Handling
 
+### Mouse Events
+
+To capture mouse position you need a tricky way because chrome pdf doesn't give us a direct api for it, check out this breakout experiment to understand how they did it: [breakout](https://github.com/osnr/horrifying-pdf-experiments/blob/master/generate_breakout.py)
+
 ### Keyboard Events
 
 In order for this to work, you need a text field with a javascript action of `key_pressed(event.change)` players must be typing in the text field to move.
