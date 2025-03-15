@@ -1,6 +1,8 @@
 import adapter from '@sveltejs/adapter-static';
 import { vitePreprocess } from '@sveltejs/vite-plugin-svelte';
 
+const dev = process.env.NODE_ENV === 'development';
+
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
 	// Consult https://svelte.dev/docs/kit/integrations
@@ -14,15 +16,12 @@ const config = {
 		adapter: adapter({
 			pages: 'build',
 			assets: 'build',
-			fallback: 'index.html',
+			fallback: undefined,
 			precompress: false,
 			strict: true
 		}),
 		alias: {
 			'@/*': './path/to/lib/*'
-		},
-		paths: {
-			base: process.env.NODE_ENV === 'production' ? '/PDFEngineEditor' : ''
 		}
 	}
 };

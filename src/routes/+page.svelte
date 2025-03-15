@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { Button } from '$lib/components/ui/button';
 	import { onMount } from 'svelte';
+	import { base } from '$app/paths';
 
 	let isMobile = false;
 
@@ -165,7 +166,7 @@
 		<div class="relative z-10 text-center">
 			<!-- Logo SVG -->
 			<div class="mb-8 flex justify-center">
-				<img src="/PDFEngine.svg" alt="PDFEngine Logo" class="h-24 w-24" />
+				<img src="{base}/PDFEngine.svg" alt="PDFEngine Logo" class="h-24 w-24" />
 			</div>
 
 			<h1 class="mb-4 text-6xl font-bold tracking-tighter">
