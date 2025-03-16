@@ -163,6 +163,24 @@
 			{/each}
 		</div>
 
+		<!-- Game Jam Announcement Banner -->
+		<div class="relative z-10 mb-12 w-full max-w-2xl">
+			<div
+				class="rounded-lg bg-gradient-to-r from-purple-600/20 to-blue-600/20 p-4 backdrop-blur-sm"
+			>
+				<div class="flex items-center justify-center gap-3">
+					<p class="text-center font-medium text-white">
+						🎮 Join our Game Jam with amazing prizes!
+						<a
+							href="https://discord.gg/SxTjmsS2g9"
+							class="ml-2 underline decoration-dotted hover:text-blue-400"
+							>Join our Discord for details →</a
+						>
+					</p>
+				</div>
+			</div>
+		</div>
+
 		<div class="relative z-10 text-center">
 			<!-- Logo SVG -->
 			<div class="mb-8 flex justify-center">
