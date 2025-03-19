@@ -45,7 +45,7 @@
     },
     {
       "type": "field",
-      "x": 184,
+      "x": 205,
       "y": 450,
       "width": 100,
       "height": 50,
@@ -53,7 +53,10 @@
       "properties": {
         "color": "#e6e6e6",
         "text": "Input Here",
-        "jsAction": "key_pressed(event.change)"
+        "jsAction": "key_pressed(event.change)",
+        "jsActions": {
+          "K": "key_pressed(event.change)"
+        }
       }
     }
   ]
