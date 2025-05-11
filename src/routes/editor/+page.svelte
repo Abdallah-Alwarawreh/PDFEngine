@@ -556,13 +556,18 @@ initGame();`;
 		const blob = new Blob([JSON.stringify(projectData, null, 2)], { type: 'application/json' });
 
 		try {
+			if (!hasFileSystem) {
+				fallbackSave();
+				return;
+			}
+
 			if (!currentFileHandle) {
 				// If no file is open, show save dialog
 				currentFileHandle = await window.showSaveFilePicker({
 					suggestedName: `${gameTitle.replace(/\s+/g, '_')}.pdfengine`,
 					types: [
 						{
-							description: 'Based Engine Project',
+							description: 'PDFEngine Project',
 							accept: {
 								'application/json': ['.pdfengine']
 							}
@@ -578,13 +583,18 @@ initGame();`;
 		} catch (err) {
 			if (err instanceof Error && err.name !== 'AbortError') {
 				console.error('Failed to save file:', err);
-				alert('Failed to save file. See console for details.');
+				// Fallback to download if File System Access API fails
+				fallbackSave();
 			}
 		}
 	}
 
 	// Save project with a new filename
 	async function saveProjectAs() {
+		if (!hasFileSystem) {
+			fallbackSave();
+			return;
+		}
 		currentFileHandle = null;
 		await saveProject();
 	}
@@ -592,10 +602,39 @@ initGame();`;
 	// Load project from file
 	async function loadProject() {
 		try {
+			if (!hasFileSystem) {
+				// Create a file input element for browsers without File System Access API
+				const input = document.createElement('input');
+				input.type = 'file';
+				input.accept = '.pdfengine';
+
+				input.onchange = async (e) => {
+					const file = (e.target as HTMLInputElement).files?.[0];
+					if (!file) return;
+
+					const text = await file.text();
+					try {
+						const projectData = JSON.parse(text);
+						gameTitle = projectData.gameTitle;
+						canvasWidth = projectData.canvasWidth;
+						canvasHeight = projectData.canvasHeight;
+						globalScript = projectData.globalScript;
+						gameElements = projectData.gameElements;
+						selectedElement = null;
+					} catch (err) {
+						console.error('Error parsing project file:', err);
+						alert('Failed to load project. Invalid file format.');
+					}
+				};
+
+				input.click();
+				return;
+			}
+
 			const [fileHandle] = await window.showOpenFilePicker({
 				types: [
 					{
-						description: 'Based Engine Project',
+						description: 'PDFEngine Project',
 						accept: {
 							'application/json': ['.pdfengine']
 						}
